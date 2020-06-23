@@ -5,13 +5,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-ldap/ldap"
 	"github.com/spf13/viper"
+	"log"
 	"os"
 	"strings"
 )
 
-func main() {
+func ReadConfigs() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
@@ -31,6 +31,12 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("Fatal error config file: %s\n", err))
 	}
+}
 
-	fmt.Println("All done")
+func main() {
+	ReadConfigs()
+
+	GetGroupsFromLdap()
+
+	log.Print("All done")
 }
