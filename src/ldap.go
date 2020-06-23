@@ -22,10 +22,11 @@ func GetGroupsFromLdap() {
 	}
 
 	// Define search
+	filter := fmt.Sprintf(viper.GetString("ldap.filter"), viper.GetString("ldap.user"))
 	searchRequest := ldap.NewSearchRequest(
 		viper.GetString("ldap.base_dn"), // The base dn to search
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		viper.GetString("ldap.filter"),                          // The filter to apply
+		filter, // The filter to apply
 		[]string{"cn", viper.GetString("ldap.group_attribute")}, // A list attributes to retrieve
 		nil,
 	)
