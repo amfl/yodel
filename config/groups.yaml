@@ -1,0 +1,23 @@
+schema_version: 0.1.0
+
+roles:
+  - name: Role-One
+    groups:
+      - Group-One
+      - Group-Two
+
+  - name: Wizard
+    groups:
+      - Magical-Group
+    roles:
+      - Role-One
+
+groups:
+  - name: Group-one
+    desc: Nice description of first group
+  - name: Group-two
+    desc: Nice description of second group
+  - name: Magical-Group
+    desc: Allows access to spells
+  - name: Amazing-Group
+    desc: These people are just amazing
