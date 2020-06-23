@@ -1,0 +1,13 @@
+ldap:
+  host_url: ldap://org.example:389
+  bind_dn: "cn=readonly,dc=org,dc=example"
+  bind_password: readonly
+  group_attribute: memberOf
+  base_dn: "ou=users,dc=org,dc=example"
+  # Filter which uniquely identifies the user
+  filter: "(&(objectClass=inetOrgPerson)(cn=%s))"
+  # The user we want to look up
+  user: your_user_here
+
+groups:
+  file: /config/groups.yaml
