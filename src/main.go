@@ -43,7 +43,9 @@ func main() {
 		log.Print(group)
 	}
 
-	GetGroupsFromYaml(viper.GetString("groups.file"))
+	group_db := GetGroupsFromYaml(viper.GetString("groups.file"))
+
+	Crunch("Wizard", groups, group_db)
 
 	log.Print("All done")
 }
