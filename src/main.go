@@ -43,5 +43,7 @@ func main() {
 		log.Print(group)
 	}
 
+	GetGroupsFromYaml(viper.GetString("groups.file"))
+
 	log.Print("All done")
 }
