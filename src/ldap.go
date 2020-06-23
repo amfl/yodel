@@ -5,7 +5,15 @@ import (
 	"github.com/go-ldap/ldap"
 	"github.com/spf13/viper"
 	"log"
+	"strings"
 )
+
+func CNToGroupName(cn string) string {
+	// Pretty hacky!
+	// Transform "cn=adminUser,ou=groups,dc=org,dc=example" => "adminUser"
+	i := strings.Index(cn, ",")
+	return cn[3:i]
+}
 
 func GetGroupsFromLdap() []string {
 	log.Print(viper.GetString("ldap.host_url"))
@@ -41,5 +49,5 @@ func GetGroupsFromLdap() []string {
 	entry := sr.Entries[0]
 	groups := entry.GetAttributeValues(viper.GetString("ldap.group_attribute"))
 
-	return groups
+	return Map(groups, CNToGroupName)
 }
