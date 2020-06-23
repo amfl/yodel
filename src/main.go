@@ -36,7 +36,12 @@ func ReadConfigs() {
 func main() {
 	ReadConfigs()
 
-	GetGroupsFromLdap()
+	groups := GetGroupsFromLdap()
+
+	// DEBUGGING - Print all attributes for this entry
+	for _, group := range groups {
+		log.Print(group)
+	}
 
 	log.Print("All done")
 }

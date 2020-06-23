@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func GetGroupsFromLdap() {
+func GetGroupsFromLdap() []string {
 	log.Print(viper.GetString("ldap.host_url"))
 	l, err := ldap.DialURL(viper.GetString("ldap.host_url"))
 	if err != nil {
@@ -37,10 +37,9 @@ func GetGroupsFromLdap() {
 		log.Fatal(err)
 	}
 
-	for _, entry := range sr.Entries {
-		// Print all attributes for this entry
-		for _, val := range entry.GetAttributeValues(viper.GetString("ldap.group_attribute")) {
-			fmt.Printf("%s: %s\n", entry.DN, val)
-		}
-	}
+	// Assume that the first matching user is always the right one
+	entry := sr.Entries[0]
+	groups := entry.GetAttributeValues(viper.GetString("ldap.group_attribute"))
+
+	return groups
 }
