@@ -1,8 +1,9 @@
-package main
+package yodel
 
 import (
 	"fmt"
-	"github.com/deckarep/golang-set"
+
+	mapset "github.com/deckarep/golang-set"
 )
 
 // func GroupLookupTable(group_db GroupFile) map[string]Group {

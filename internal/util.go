@@ -1,4 +1,4 @@
-package main
+package yodel
 
 func Map(vs []string, f func(string) string) []string {
 	vsm := make([]string, len(vs))

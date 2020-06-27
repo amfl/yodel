@@ -5,13 +5,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/amfl/yodel/internal"
+	"github.com/spf13/viper"
 )
 
-func ReadConfigs() {
+func readConfigs() {
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
@@ -34,18 +36,18 @@ func ReadConfigs() {
 }
 
 func main() {
-	ReadConfigs()
+	readConfigs()
 
-	groups := GetGroupsFromLdap()
+	groups := yodel.GetGroupsFromLdap()
 
 	// DEBUGGING - Print all attributes for this entry
 	for _, group := range groups {
 		log.Print(group)
 	}
 
-	group_db := GetGroupsFromYaml(viper.GetString("groups.file"))
+	group_db := yodel.GetGroupsFromYaml(viper.GetString("groups.file"))
 
-	Crunch("Wizard", groups, group_db)
+	yodel.Crunch("Wizard", groups, group_db)
 
 	log.Print("All done")
 }

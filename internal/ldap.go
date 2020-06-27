@@ -1,11 +1,12 @@
-package main
+package yodel
 
 import (
 	"fmt"
-	"github.com/go-ldap/ldap"
-	"github.com/spf13/viper"
 	"log"
 	"strings"
+
+	"github.com/go-ldap/ldap"
+	"github.com/spf13/viper"
 )
 
 func CNToGroupName(cn string) string {
