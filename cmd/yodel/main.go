@@ -1,6 +1,3 @@
-// Based on go-ircevent examples
-// https://github.com/thoj/go-ircevent/tree/master/examples
-
 package main
 
 import (
