@@ -1,0 +1,102 @@
+name: Build release artifacts
+on:
+  push:
+    tags:
+    - "*"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        go: [1.14.x]
+    steps:
+    - name: Set up Go ${{ matrix.go }}
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go }}
+      id: go
+
+    - name: Check out code into the Go module directory
+      id: checkout
+      uses: actions/checkout@v2
+
+    # Grab the tag, store it in $GIT_TAG_NAME
+    - uses: olegtarasov/get-tag@v2
+
+    - name: Echo the tag
+      # with:
+      #   tagname: ${{ steps.tagName.outputs.tag }}
+      run: echo $GIT_TAG_NAME
+
+    - uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Get dependencies
+      shell: bash
+      run: |
+        go get -v -d ./...
+
+    - name: Build
+      shell: bash
+      env:
+        OS: ${{ runner.os }}
+        # Don't dynamically call C code.
+        # This makes builds quite slow, so only do this on a release.
+        CGO_ENABLED: 0
+        # TAG: ${{ steps.tag.outputs.result }}
+      run: |
+        OS=$(echo $OS | tr [A-Z] [a-z])
+         go build -a -ldflags '-extldflags "-static"' -v -o build/yodel-${OS}-${GIT_TAG_NAME} ./cmd/yodel
+
+    - name: Archive build artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: build
+        path: build
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build]
+
+    steps:
+
+    - uses: olegtarasov/get-tag@v2
+
+    - name: Echo the tag
+      run: echo $GIT_TAG_NAME
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: build
+        path: build
+
+    - name: Check something
+      shell: bash
+      run: ls -al
+
+    # Create a draft release with a template that I can fill in manually in the Github web UI
+    - uses: ncipollo/release-action@v1
+      with:
+        # Provided by default
+        # tag: $GIT_TAG_NAME
+        draft: true
+        prerelease: true
+        artifacts: "build/*" # Output path of Go build from the Merge Master workflow
+        body: |
+          # Release
+
+          ## Features
+          - here
+
+          ## Fixes
+          - here
+
+        token: ${{ secrets.GITHUB_TOKEN }}
