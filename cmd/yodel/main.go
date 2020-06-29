@@ -33,6 +33,8 @@ func readConfigs() {
 }
 
 func main() {
+	args := os.Args[1:]
+
 	readConfigs()
 
 	groups := yodel.GetGroupsFromLdap()
@@ -44,7 +46,8 @@ func main() {
 
 	group_db := yodel.GetGroupsFromYaml(viper.GetString("groups.file"))
 
-	yodel.Crunch("Wizard", groups, group_db)
+	roleName := args[0]
+	yodel.Crunch(roleName, groups, group_db)
 
 	log.Print("All done")
 }
