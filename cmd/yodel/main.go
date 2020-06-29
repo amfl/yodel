@@ -35,19 +35,47 @@ func readConfigs() {
 func main() {
 	args := os.Args[1:]
 
+	ldapUser := args[0]
+	roleName := args[1]
+
 	readConfigs()
 
-	groups := yodel.GetGroupsFromLdap()
+	// Construct our two directory interfaces
+	ldapConfig := yodel.GenerateLdapConfig()
+	ldapDir := yodel.NewLdapDirectory(ldapConfig)
+	yamlDir := yodel.NewYamlDirectory(viper.GetString("groups.file"))
 
-	// DEBUGGING - Print all attributes for this entry
-	for _, group := range groups {
-		log.Print(group)
+	// SYNC
+	err := ldapDir.Sync()
+	if err != nil {
+		panic(fmt.Errorf("Error syncing LDAP: %s\n", err))
+	}
+	err = yamlDir.Sync()
+	if err != nil {
+		panic(fmt.Errorf("Error syncing YAML: %s\n", err))
 	}
 
-	group_db := yodel.GetGroupsFromYaml(viper.GetString("groups.file"))
+	// SEARCH
+	// Extract groups from directory interfaces
+	ldapGroups, err := ldapDir.Search(ldapUser)
+	if err != nil {
+		panic(fmt.Errorf("Error searching LDAP: %s\n", err))
+	}
+	log.Println(ldapGroups)
+	yamlGroups, err := yamlDir.Search(roleName)
+	if err != nil {
+		panic(fmt.Errorf("Error searching YAML: %s\n", err))
+	}
 
-	roleName := args[0]
-	yodel.Crunch(roleName, groups, group_db)
+	// Find the difference
+	diff := yamlGroups.Difference(ldapGroups)
+
+	// Annotation function from yaml
+	output, err := yodel.OutputYaml(diff, yamlDir.AnnotationFunction)
+	if err != nil {
+		panic(fmt.Errorf("Error formatting output: %s\n", err))
+	}
+	fmt.Println(output)
 
 	log.Print("All done")
 }
