@@ -1,5 +1,7 @@
 # Yodel
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/amfl/yodel)](https://goreportcard.com/report/github.com/amfl/yodel)
+
 Tool for doing LDAP lookups and comparing actual groups with desired groups,
 according to some role defined in YAML.
 
