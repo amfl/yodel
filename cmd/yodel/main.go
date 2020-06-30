@@ -29,7 +29,7 @@ func readConfigs() {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s\n", err))
+		panic(fmt.Errorf("Fatal error config file: %s", err))
 	}
 }
 
@@ -59,23 +59,23 @@ func main() {
 	// SYNC
 	err := ldapDir.Sync()
 	if err != nil {
-		panic(fmt.Errorf("Error syncing LDAP: %s\n", err))
+		panic(fmt.Errorf("Error syncing LDAP: %s", err))
 	}
 	err = yamlDir.Sync()
 	if err != nil {
-		panic(fmt.Errorf("Error syncing YAML: %s\n", err))
+		panic(fmt.Errorf("Error syncing YAML: %s", err))
 	}
 
 	// SEARCH
 	// Extract groups from directory interfaces
 	ldapGroups, err := ldapDir.Search(ldapUser)
 	if err != nil {
-		panic(fmt.Errorf("Error searching LDAP: %s\n", err))
+		panic(fmt.Errorf("Error searching LDAP: %s", err))
 	}
 	log.Println(ldapGroups)
 	yamlGroups, err := yamlDir.Search(roleName)
 	if err != nil {
-		panic(fmt.Errorf("Error searching YAML: %s\n", err))
+		panic(fmt.Errorf("Error searching YAML: %s", err))
 	}
 
 	// Find the difference
@@ -84,7 +84,7 @@ func main() {
 	// Annotation function from yaml
 	output, err := yodel.OutputYaml(diff, yamlDir.AnnotationFunction)
 	if err != nil {
-		panic(fmt.Errorf("Error formatting output: %s\n", err))
+		panic(fmt.Errorf("Error formatting output: %s", err))
 	}
 	fmt.Println(output)
 

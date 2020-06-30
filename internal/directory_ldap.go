@@ -10,6 +10,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+// LdapConfig represents all the configuration required to connect to an LDAP
+// server and run queries.
 type LdapConfig struct {
 	HostURL        string
 	BindDN         string
@@ -19,13 +21,16 @@ type LdapConfig struct {
 	Filter         string // Filter which uniquely identifies the user
 }
 
+// CNToGroupName will transform a full CN string
+// ("cn=adminUser,ou=groups,dc=org,dc=example") to a group name ("adminUser").
 func CNToGroupName(cn string) string {
 	// Pretty hacky!
-	// Transform "cn=adminUser,ou=groups,dc=org,dc=example" => "adminUser"
 	i := strings.Index(cn, ",")
 	return cn[3:i]
 }
 
+// GenerateLdapConfig generates an LDAP config object from external config
+// files or environment variables.
 func GenerateLdapConfig() LdapConfig {
 	return LdapConfig{
 		HostURL:        viper.GetString("ldap.host_url"),
@@ -39,11 +44,13 @@ func GenerateLdapConfig() LdapConfig {
 
 //////////////////////
 
+// LdapDirectory represents a queryable LDAP directory service,
 type LdapDirectory struct {
-	cache  groups
+	cache  GroupSet
 	config LdapConfig
 }
 
+// NewLdapDirectory acts as a constructor for LdapDirectory
 func NewLdapDirectory(config LdapConfig) *LdapDirectory {
 	l := new(LdapDirectory)
 	l.cache = mapset.NewSet()
@@ -51,7 +58,9 @@ func NewLdapDirectory(config LdapConfig) *LdapDirectory {
 	return l
 }
 
-func (l LdapDirectory) Search(lookup string) (groups, error) {
+// Search performs a search against the configured LDAP server by
+// substituting the `lookup` argument into the configured filter.
+func (l LdapDirectory) Search(lookup string) (GroupSet, error) {
 	log.Print(l.config.HostURL)
 	ld, err := ldap.DialURL(l.config.HostURL)
 	if err != nil {
@@ -92,9 +101,15 @@ func (l LdapDirectory) Search(lookup string) (groups, error) {
 	entry := sr.Entries[0]
 	groups := entry.GetAttributeValues(l.config.GroupAttribute)
 
-	return AsSet(Map(groups, CNToGroupName)), nil
+	resultSet := mapset.NewSet()
+	for _, group := range groups {
+		resultSet.Add(CNToGroupName(group))
+	}
+	return resultSet, nil
 }
 
+// Sync gets this directory service ready to issue searches. In the case of
+// LDAP, this method does nothing.
 func (l LdapDirectory) Sync() error {
 	return nil
 }
