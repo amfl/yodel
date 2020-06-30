@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/amfl/yodel/internal"
@@ -32,8 +33,18 @@ func readConfigs() {
 	}
 }
 
+func printUsage() {
+	fmt.Printf("Usage: %s LDAP_USERNAME ROLE_NAME\n",
+		filepath.Base(os.Args[0]))
+}
+
 func main() {
 	args := os.Args[1:]
+
+	if len(args) != 2 {
+		printUsage()
+		os.Exit(99)
+	}
 
 	ldapUser := args[0]
 	roleName := args[1]
