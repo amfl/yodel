@@ -101,7 +101,11 @@ func (l LdapDirectory) Search(lookup string) (GroupSet, error) {
 	entry := sr.Entries[0]
 	groups := entry.GetAttributeValues(l.config.GroupAttribute)
 
-	return AsSet(Map(groups, CNToGroupName)), nil
+	resultSet := mapset.NewSet()
+	for _, group := range groups {
+		resultSet.Add(CNToGroupName(group))
+	}
+	return resultSet, nil
 }
 
 // Sync gets this directory service ready to issue searches. In the case of
