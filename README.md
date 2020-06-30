@@ -11,3 +11,9 @@ according to some role defined in YAML.
 - Can read a user's current groups from LDAP
 - Can read group/role database from YAML
 - Can perform basic set operations on the above two sources
+
+## Usage
+
+```bash
+yodel LDAP_USERNAME ROLE_NAME
+```
