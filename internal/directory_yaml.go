@@ -7,31 +7,36 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type Role struct {
+// YamlRole is used when deserializing group database files.
+type YamlRole struct {
 	Name   string
 	Groups []string
 	Roles  []string
 }
 
-type Group struct {
+// YamlGroup is used when deserializing group database files.
+type YamlGroup struct {
 	Name string
 	Desc string
 }
 
-type GroupFile struct {
+// YamlGroupFile is the in-memory representation of a group database file.
+type YamlGroupFile struct {
 	SchemaVersion string `yaml:"schema_version"`
-	Roles         []Role
-	Groups        []Group
+	Roles         []YamlRole
+	Groups        []YamlGroup
 }
 
 //////////////////////
 
+// YamlDirectory exposes the group database file as a query directory service.
 type YamlDirectory struct {
 	cache    GroupSet
-	gf       GroupFile
+	gf       YamlGroupFile
 	filepath string
 }
 
+// NewYamlDirectory acts as a constructor for YamlDirectory
 func NewYamlDirectory(filepath string) *YamlDirectory {
 	y := new(YamlDirectory)
 	y.cache = mapset.NewSet()
@@ -39,6 +44,8 @@ func NewYamlDirectory(filepath string) *YamlDirectory {
 	return y
 }
 
+// Search performs a search on the in-memory group database by finding roles
+// which match the given `lookup` string.
 func (y *YamlDirectory) Search(lookup string) (GroupSet, error) {
 	result := mapset.NewSet()
 	for _, r := range y.gf.Roles {
@@ -61,13 +68,15 @@ func (y *YamlDirectory) Search(lookup string) (GroupSet, error) {
 	return result, nil
 }
 
+// Sync gets this directory service ready to issue searches. In the case of
+// YAML, this method reads the database file into memory.
 func (y *YamlDirectory) Sync() error {
 	groupDB, err := ioutil.ReadFile(y.filepath)
 	if err != nil {
 		return err
 	}
 
-	gf := GroupFile{}
+	gf := YamlGroupFile{}
 	err = yaml.Unmarshal(groupDB, &gf)
 	if err != nil {
 		return err
@@ -79,6 +88,10 @@ func (y *YamlDirectory) Sync() error {
 	return nil
 }
 
+// AnnotationFunction can be used to associate groups with descriptions
+// present in the group database file. Useful to make a list of groups more
+// human readable in program output.
 func (y YamlDirectory) AnnotationFunction(string) string {
-	return "Temporary string!"
+	// TODO
+	return "UNIMPLEMENTED"
 }

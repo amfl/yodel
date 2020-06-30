@@ -5,6 +5,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// OutputYaml outputs a set of groups as yaml :)
 func OutputYaml(groups mapset.Set, annotate func(string) string) (string, error) {
 	// Convert to slice
 	slice := groups.ToSlice()
