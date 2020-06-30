@@ -12,9 +12,9 @@ func Map(vs []string, f func(string) string) []string {
 	return vsm
 }
 
-func AsSet(str_list []string) mapset.Set {
-	s := make([]interface{}, len(str_list))
-	for i, v := range str_list {
+func AsSet(strList []string) mapset.Set {
+	s := make([]interface{}, len(strList))
+	for i, v := range strList {
 		s[i] = v
 	}
 	return mapset.NewSetFromSlice(s)
