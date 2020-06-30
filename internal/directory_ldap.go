@@ -40,7 +40,7 @@ func GenerateLdapConfig() LdapConfig {
 //////////////////////
 
 type LdapDirectory struct {
-	cache  groups
+	cache  GroupSet
 	config LdapConfig
 }
 
@@ -51,7 +51,7 @@ func NewLdapDirectory(config LdapConfig) *LdapDirectory {
 	return l
 }
 
-func (l LdapDirectory) Search(lookup string) (groups, error) {
+func (l LdapDirectory) Search(lookup string) (GroupSet, error) {
 	log.Print(l.config.HostURL)
 	ld, err := ldap.DialURL(l.config.HostURL)
 	if err != nil {

@@ -27,7 +27,7 @@ type GroupFile struct {
 //////////////////////
 
 type YamlDirectory struct {
-	cache    groups
+	cache    GroupSet
 	gf       GroupFile
 	filepath string
 }
@@ -39,7 +39,7 @@ func NewYamlDirectory(filepath string) *YamlDirectory {
 	return y
 }
 
-func (y *YamlDirectory) Search(lookup string) (groups, error) {
+func (y *YamlDirectory) Search(lookup string) (GroupSet, error) {
 	result := mapset.NewSet()
 	for _, r := range y.gf.Roles {
 		if r.Name == lookup {

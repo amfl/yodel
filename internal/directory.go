@@ -4,9 +4,9 @@ import (
 	mapset "github.com/deckarep/golang-set"
 )
 
-type groups mapset.Set
+type GroupSet mapset.Set
 
 type Directory interface {
-	Search(lookup string) (groups, error)
+	Search(lookup string) (GroupSet, error)
 	Sync() error
 }
