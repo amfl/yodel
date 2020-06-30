@@ -5,7 +5,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func OutputYaml(groups mapset.Set, f func(string) string) (string, error) {
+func OutputYaml(groups mapset.Set, annotate func(string) string) (string, error) {
 	// Convert to slice
 	slice := groups.ToSlice()
 
@@ -15,5 +15,5 @@ func OutputYaml(groups mapset.Set, f func(string) string) (string, error) {
 		return "", err
 	}
 
-	return string(d) + f("temp"), nil
+	return string(d), nil
 }
