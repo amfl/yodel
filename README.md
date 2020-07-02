@@ -15,5 +15,9 @@ according to some role defined in YAML.
 ## Usage
 
 ```bash
-yodel LDAP_USERNAME ROLE_NAME
+yodel LDAP_USERNAME [ROLE_NAME]
 ```
+
+- If `ROLE_NAME` is omitted, yodel will output the user's current LDAP groups.
+- If `ROLE_NAME` is provided, yodel will output the groups the user is missing
+  from LDAP in order to have the role.

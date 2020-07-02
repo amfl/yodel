@@ -34,20 +34,20 @@ func readConfigs() {
 }
 
 func printUsage() {
-	fmt.Printf("Usage: %s LDAP_USERNAME ROLE_NAME\n",
+	fmt.Printf("Usage: %s LDAP_USERNAME [ROLE_NAME]\n",
 		filepath.Base(os.Args[0]))
 }
 
 func main() {
 	args := os.Args[1:]
 
-	if len(args) != 2 {
+	if len(args) < 1 || len(args) > 2 {
 		printUsage()
 		os.Exit(99)
 	}
 
 	ldapUser := args[0]
-	roleName := args[1]
+	performingDiff := (len(args) == 2)
 
 	readConfigs()
 
@@ -73,16 +73,23 @@ func main() {
 		panic(fmt.Errorf("Error searching LDAP: %s", err))
 	}
 	log.Println(ldapGroups)
-	yamlGroups, err := yamlDir.Search(roleName)
-	if err != nil {
-		panic(fmt.Errorf("Error searching YAML: %s", err))
+
+	outputGroups := ldapGroups
+
+	// Logic changes based on how many args we passed
+	if performingDiff {
+		roleName := args[1]
+		yamlGroups, err := yamlDir.Search(roleName)
+		if err != nil {
+			panic(fmt.Errorf("Error searching YAML: %s", err))
+		}
+
+		// Find the difference
+		outputGroups = yamlGroups.Difference(ldapGroups)
 	}
 
-	// Find the difference
-	diff := yamlGroups.Difference(ldapGroups)
-
 	// Annotation function from yaml
-	output, err := yodel.OutputYaml(diff, yamlDir.AnnotationFunction)
+	output, err := yodel.OutputYaml(outputGroups, yamlDir.AnnotationFunction)
 	if err != nil {
 		panic(fmt.Errorf("Error formatting output: %s", err))
 	}
