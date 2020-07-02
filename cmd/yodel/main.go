@@ -95,5 +95,10 @@ func main() {
 	}
 	fmt.Println(output)
 
+	if performingDiff && outputGroups.Cardinality() != 0 {
+		// Non-zero exit if user is missing groups
+		os.Exit(1)
+	}
+
 	log.Print("All done")
 }
