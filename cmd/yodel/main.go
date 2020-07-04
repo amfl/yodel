@@ -89,7 +89,7 @@ func main() {
 	}
 
 	// Annotation function from yaml
-	output, err := yodel.OutputYaml(outputGroups, yamlDir.AnnotationFunction)
+	output, err := yodel.OutputTable(outputGroups)
 	if err != nil {
 		panic(fmt.Errorf("Error formatting output: %s", err))
 	}
