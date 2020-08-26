@@ -18,7 +18,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflag
 
 ##############################
 
-FROM scratch AS final
+FROM busybox:1.32 AS final
 # Import the time zone files
 COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 # Import the user and group files
@@ -26,10 +26,9 @@ COPY --from=builder /user/group /user/passwd /etc/
 # Import the CA certs
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 # Import the compiled go executable
-COPY --from=builder /build/yodel /
-WORKDIR /
+COPY --from=builder /build/yodel /bin/
 # Run as unprivileged
 USER nobody:nobody
 ENV YODEL_CONFIG_PATH=/config
 VOLUME /config
-ENTRYPOINT ["/yodel"]
+CMD ["/bin/yodel"]
