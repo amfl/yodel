@@ -1,0 +1,6 @@
+Dockerfile
+config/
+build.sh
+*.md
+LICENSE
+.git
