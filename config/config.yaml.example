@@ -9,3 +9,7 @@ ldap:
 
 groups:
   file: /config/groups.yaml
+
+security:
+  ignore_tls: false
+  certificate_authority: "./test.pem"

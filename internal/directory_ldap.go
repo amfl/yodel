@@ -1,12 +1,15 @@
 package yodel
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"strings"
 
 	mapset "github.com/deckarep/golang-set"
-	"github.com/go-ldap/ldap"
+	"github.com/go-ldap/ldap/v3"
 	"github.com/spf13/viper"
 )
 
@@ -58,11 +61,42 @@ func NewLdapDirectory(config LdapConfig) *LdapDirectory {
 	return l
 }
 
+func getTLSConfig() *tls.Config {
+	insecure := viper.GetBool("security.ignore_tls")
+
+	// Get the SystemCertPool, continue with an empty pool on error
+	rootCAs, _ := x509.SystemCertPool()
+	if rootCAs == nil {
+		rootCAs = x509.NewCertPool()
+	}
+
+	// Read in the cert file
+	localCertFile := viper.GetString("security.certificate_authority")
+	certs, err := ioutil.ReadFile(localCertFile)
+	if err != nil {
+		log.Fatalf("Failed to append %q to RootCAs: %v", localCertFile, err)
+	}
+
+	// Append our cert to the system pool
+	if ok := rootCAs.AppendCertsFromPEM(certs); !ok {
+		log.Println("No certs appended, using system certs only")
+	}
+
+	// Trust the augmented cert pool in our client
+	config := &tls.Config{
+		InsecureSkipVerify: insecure,
+		RootCAs:            rootCAs,
+	}
+
+	return config
+}
+
 // Search performs a search against the configured LDAP server by
 // substituting the `lookup` argument into the configured filter.
 func (l LdapDirectory) Search(lookup string) (GroupSet, error) {
 	log.Print(l.config.HostURL)
-	ld, err := ldap.DialURL(l.config.HostURL)
+	dialOpt := ldap.DialWithTLSConfig(getTLSConfig())
+	ld, err := ldap.DialURL(l.config.HostURL, dialOpt)
 	if err != nil {
 		log.Fatal(err)
 	}
