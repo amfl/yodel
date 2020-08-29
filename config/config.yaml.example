@@ -1,6 +1,7 @@
 ldap:
   host_url: ldap://org.example:389
-  bind_dn: "cn=readonly,dc=org,dc=example"
+  bind_dn: "cn=%s,dc=org,dc=example"
+  bind_username: readonly  # Will be substituted into `bind_dn`
   bind_password: readonly
   group_attribute: memberOf
   base_dn: "ou=users,dc=org,dc=example"

@@ -32,9 +32,16 @@ func CNToGroupName(cn string) string {
 // GenerateLdapConfig generates an LDAP config object from external config
 // files or environment variables.
 func GenerateLdapConfig() LdapConfig {
+	// Dynamically generate the bind dn
+	bind_dn := viper.GetString("ldap.bind_dn")
+	user := viper.GetString("ldap.bind_username")
+	if strings.Contains(bind_dn, "%s") {
+		bind_dn = fmt.Sprintf(bind_dn, user)
+	}
+
 	return LdapConfig{
 		HostURL:        viper.GetString("ldap.host_url"),
-		BindDN:         viper.GetString("ldap.bind_dn"),
+		BindDN:         bind_dn,
 		BindPassword:   viper.GetString("ldap.bind_password"),
 		GroupAttribute: viper.GetString("ldap.group_attribute"),
 		BaseDN:         viper.GetString("ldap.base_dn"),
